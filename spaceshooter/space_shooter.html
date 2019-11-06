@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #canvas {
+            border: 1px solid;
+            width: 850px;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+
+    var bg = new Image();
+    bg.src="image/bg.jpg";
+
+    var pesawat = new Image();
+    pesawat.src = "image/plane.png";
+
+    var lose = new Image();
+    lose.src = "image/lose.png";
+
+    var misil = new Image();
+    misil.src = "image/misil.png";
+
+    var batu = new Image();
+    batu.src = "image/meteor.png";
+
+    var win = new Image();
+    win.src = "image/win.jpg";
+
+    var shoot = new Audio();
+    shoot.src = "audio/weapon_player.wav";
+
+    var explosion = new Audio();
+    explosion.src = "audio/explosion_asteroid.wav";
+
+    var bgm = new Audio();
+    bgm.src = "audio/bgm.wav";
+
+
+    function aksikanvas(){
+
+        document.addEventListener('keydown', function(event){
+            if (event.keyCode == 37){
+                pesawat1.x-=5;
+            }else if(event.keyCode == 38){
+                pesawat1.y-=5;
+            }else if (event.keyCode == 39) {
+                pesawat1.x += 5;
+            }else if (event.keyCode == 40) {
+                pesawat1.y += 5;
+            }else if (event.keyCode == 88) {
+                shoot.play();
+                peluru.push({"x":pesawat1.x+80,"y":pesawat1.y+30,"w":68,"h":37})
+
+            }
+        })
+
+        var canvas = document.getElementById('canvas');
+        var ctx    = canvas.getContext('2d');
+
+        canvas.width  = canvas.scrollWidth;
+        canvas.height = canvas.scrollHeight;
+
+        var  cW = canvas.width;
+        var  cH = canvas.height;
+
+
+        var peluru=[];
+
+    function renderpeluru(){
+    for (var i=0;i<peluru.length;i++) {
+             var p=peluru[i];
+             ctx.drawImage(misil,p.x+=5,p.y)
+        }
+        if(p.x>cW){
+            peluru.splace(i,1);
+        }
+    }
+
+        var meteor =[
+            { "x": 850,  "y":150,"  w":84,  "h":64},
+            { "x": 900, "y": 250, "w": 84, "h": 64 },
+            { "x": 700, "y": 180, "w": 84, "h": 64 },
+            { "x": 750, "y": 100, "w": 84, "h": 64 }
+        ];
+
+    function renderMeteor(){
+        for (var i = 0; i < meteor.length; i++) {
+        var m =meteor[i];
+        ctx.drawImage(batu,m.x-=2,m.y)
+        }
+        if((m.x<0)||(m.x<pesawat1.x+pesawat1.w && m.y+m.h>pesawat1.y && m.y<pesawat1.y+pesawat1.h)){
+            claerInterval(interval);
+            ctx.drawImage(lose,520,150);
+        }
+    }
+
+    function kena(){
+        for(var i=0;i<meteor.length;i++){
+            var m=meteor[i];
+            for(var j=0;j<peluru.length;j++){
+            var p=peluru[j];
+
+            if(p.x>m.x && p.y+p.h>m.y && p.y<m.y+m.h){
+                meteor.splice(i,1);
+                peluru.splice(j,1);
+                explosion.play();
+            }
+            }
+        }
+        if(meteor.length==0){
+            bgm.pause();
+            clearInterval(interval);
+            ctx.clearRect(0,0,cW,cH);
+            ctx.drawImage(win,0,0);
+        }
+    }
+
+    function Bg(){
+        this.x=0,this.y=0;
+        this.render=function(){
+            ctx.drawImage(bg,this.x--,this.y);
+            if(this.x == -1699){
+                this.x=0;
+            }
+        }
+    }
+
+    var back = new Bg();
+
+    function Pesawat(){
+        this.x=100,this.y=200,this.w=100,this.h=70;
+        this.render=function(){
+            ctx.drawImage(pesawat,this.x,this.y,this.w,this.h);
+                  bgm.play();
+        }
+    }
+
+    var pesawat1 = new Pesawat();
+
+    function animasi(){
+        ctx.save();
+        ctx.clearRect(0,0,cW,cH);
+        back.render();
+        pesawat1.render();
+        renderpeluru();
+        renderMeteor();
+        kena();
+        ctx.restore();
+    }
+
+    var interval = setInterval(animasi,30);
+}
+    window.onload=aksikanvas;
+</script>
+</body>
+</html>
